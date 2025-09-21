@@ -24,3 +24,8 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+:root { scroll-behavior: smooth; }
+
+/* --- FIX: fondo siempre blanco y sin modo oscuro automático --- */
+            /* slate-900 aprox para buen contraste */
