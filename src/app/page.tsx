@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar";
 import Hero from "@/components/Hero";
+import About from "@/components/About";
 import Solutions from "@/components/Solutions";
 import Contact from "@/components/Contact";
 import HowItWorks from "@/components/HowItWorks";
@@ -17,6 +18,10 @@ export default function HomePage() {
         
         <section id="hero" className="snap-child">
           <Hero />
+        </section>
+
+        <section id="about" className="snap-child">
+          <About />
         </section>
 
         <section id="soluciones" className="snap-child">

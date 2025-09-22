@@ -1,9 +1,21 @@
 "use client";
+
+import Image from "next/image";
 import { useEffect, useState } from "react";
+
+const LINKS = [
+    { href: "#hero", id: "hero", label: "Inicio" },
+    { href: "#nosotros", id: "nosotros", label: "Nosotros" },
+    { href: "#soluciones", id: "soluciones", label: "Servicios" },
+    { href: "#proyectos", id: "proyectos", label: "Proyectos" },
+    { href: "#contacto", id: "contacto", label: "Cotizar" },
+];
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
+    const [active, setActive] = useState<string>("hero");
 
+    // sombra/estilo al scrollear
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 8);
         onScroll();
@@ -11,58 +23,96 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
+    // scroll-spy: resalta el link de la sección visible
+    useEffect(() => {
+        const sections = LINKS.map((l) => document.getElementById(l.id)).filter(Boolean) as HTMLElement[];
+
+        if (!sections.length) return;
+
+        const io = new IntersectionObserver(
+            (entries) => {
+                // elegimos la entrada con mayor “intersección”
+                const visible = entries
+                    .filter((e) => e.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+                if (visible?.target?.id) setActive(visible.target.id);
+            },
+            {
+                // foco en el tercio central de la pantalla
+                rootMargin: "-40% 0px -45% 0px",
+                threshold: [0, 0.01, 0.2, 0.4, 0.6, 0.8, 1],
+            }
+        );
+
+        sections.forEach((el) => io.observe(el));
+        return () => io.disconnect();
+    }, []);
+
     return (
-        // solo la cápsula es sticky; el header no pinta fondo
-        <header className="sticky top-4 md:top-6 z-50 bg-transparent pointer-events-none">
-            <div className="mx-auto max-w-6xl px-4">
-                <div
-                    className={[
-                        "pointer-events-auto rounded-3xl border ring-1 ring-slate-100",
-                        "bg-white/95 backdrop-blur px-4 md:px-6",
-                        "transition-all duration-300",
-                        scrolled ? "border-slate-300" : "border-slate-200",
-                    ].join(" ")}
-                    style={{
-                        boxShadow: scrolled
-                            ? "0 34px 90px rgba(0,0,0,0.22)" // sombra más intensa al scrollear
-                            : "0 10px 28px rgba(0,0,0,0.08)",
-                    }}
-                >
-                    <div className="h-20 flex items-center justify-between">
-                        {/* Wordmark */}
-                        <a href="#" className="font-extrabold tracking-tight text-xl md:text-2xl">
-                            <span className="text-slate-900">NOVA</span>
-                            <span className="text-emerald-600">TECH</span>
-                        </a>
+        <header
+            className="fixed inset-x-0 top-0 z-50 pointer-events-none"
+            aria-label="Barra de navegación"
+        >
+            <div
+                className={[
+                    "mx-auto max-w-6xl rounded-3xl bg-white/90 backdrop-blur",
+                    "mt-[var(--nav-gap)] px-4 md:px-6",
+                    "pointer-events-auto",
+                    scrolled ? "border border-slate-200 shadow-xl" : "border border-transparent shadow-lg",
+                ].join(" ")}
+                style={{
+                    boxShadow: scrolled
+                        ? "0 34px 90px rgba(0,0,0,0.22)"
+                        : "0 10px 28px rgba(0,0,0,0.08)",
+                }}
+            >
+                <div className="h-20 flex items-center">
+                    {/* Logo (más grande) */}
+                    <a href="#hero" className="flex items-center">
+                        <Image
+                            src="/media/logo.png"
+                            alt="Novatech"
+                            width={180}
+                            height={40}
+                            priority
+                            className="h-16 w-auto"
+                        />
+                    </a>
 
-                        {/* Menú desktop */}
-                        <nav className="hidden md:flex items-center gap-8 text-[15px] text-slate-700">
-                            <a href="#" className="hover:text-emerald-700">Inicio</a>
-                            <a href="#nosotros" className="hover:text-emerald-700">Nosotros</a>
-                            <a href="#soluciones" className="hover:text-emerald-700">Servicios</a>
-                            <a href="#proyectos" className="hover:text-emerald-700">Proyectos</a>
-                            <a href="#contacto" className="hover:text-emerald-700">Cotizar</a>
-                        </nav>
+                    {/* Menú centrado */}
+                    <nav className="hidden md:flex flex-1 items-center justify-center">
+                        <ul className="flex items-center gap-10 text-[17px] md:text-[18px] font-semibold text-slate-800">
+                            {LINKS.map((l) => {
+                                const isActive = active === l.id;
+                                return (
+                                    <li key={l.id}>
+                                        <a
+                                            href={l.href}
+                                            className={[
+                                                "relative group py-2 transition-colors",
+                                                isActive ? "text-emerald-700" : "hover:text-emerald-700",
+                                            ].join(" ")}
+                                        >
+                                            {l.label}
+                                            <span
+                                                className={[
+                                                    "pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[3px] rounded-full bg-emerald-600 origin-center transition-transform duration-300",
+                                                    isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
+                                                ].join(" ")}
+                                            />
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </nav>
 
-                        {/* Acciones */}
-                        <div className="hidden md:flex items-center gap-3">
-                            <a
-                                href="#agro"
-                                className="rounded-2xl bg-lime-500 px-5 py-2.5 text-white font-semibold hover:bg-lime-600"
-                            >
-                                Línea Agro
-                            </a>
-                            <a
-                                href="#contacto"
-                                className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-white font-semibold hover:bg-emerald-700"
-                            >
-                                Solicitar cotización
-                            </a>
-                        </div>
+                    {/* Reservo espacio simétrico a la derecha para que el centro quede perfecto */}
+                    <div className="hidden md:block w-[180px]" />
 
-                        {/* Hamburguesa */}
-                        <MobileMenu />
-                    </div>
+                    {/* Hamburguesa / menú móvil */}
+                    <MobileMenu />
                 </div>
             </div>
         </header>
@@ -71,52 +121,53 @@ export default function Navbar() {
 
 function MobileMenu() {
     const [open, setOpen] = useState(false);
+
     return (
-        <>
+        <div className="ml-auto md:hidden">
             <button
                 aria-label="Abrir menú"
-                className="md:hidden inline-flex items-center justify-center rounded-xl border px-3 py-2 text-slate-700"
-                onClick={() => setOpen(v => !v)}
+                className="inline-flex items-center justify-center rounded-xl border px-3 py-2 text-slate-700"
+                onClick={() => setOpen((v) => !v)}
             >
                 <svg width="22" height="22" viewBox="0 0 24 24">
                     {open ? (
-                        <path d="M6 6l12 12M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <path
+                            d="M6 6l12 12M6 18L18 6"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                        />
                     ) : (
-                        <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <path
+                            d="M4 7h16M4 12h16M4 17h16"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                        />
                     )}
                 </svg>
             </button>
 
             {open && (
-                <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-slate-200 bg-white shadow-lg md:hidden">
-                    <nav className="px-4 py-3 flex flex-col gap-2 text-slate-700">
-                        <a href="#" className="py-2" onClick={() => setOpen(false)}>Inicio</a>
-                        <a href="#nosotros" className="py-2" onClick={() => setOpen(false)}>Nosotros</a>
-                        <a href="#soluciones" className="py-2" onClick={() => setOpen(false)}>Servicios</a>
-                        <a href="#proyectos" className="py-2" onClick={() => setOpen(false)}>Proyectos</a>
-                        <a href="#contacto" className="py-2" onClick={() => setOpen(false)}>Cotizar</a>
-                        <div className="pt-2 flex gap-2">
+                <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-slate-200 bg-white shadow-lg">
+                    <nav className="px-4 py-3 flex flex-col gap-1 text-slate-800">
+                        {LINKS.map((l) => (
                             <a
-                                href="#agro"
-                                className="w-full text-center rounded-xl bg-lime-500 px-4 py-2 text-white font-semibold hover:bg-lime-600"
+                                key={l.id}
+                                href={l.href}
+                                className="py-2 rounded-md hover:bg-slate-50"
                                 onClick={() => setOpen(false)}
                             >
-                                Línea Agro
+                                {l.label}
                             </a>
-                            <a
-                                href="#contacto"
-                                className="w-full text-center rounded-xl bg-emerald-600 px-4 py-2 text-white font-semibold hover:bg-emerald-700"
-                                onClick={() => setOpen(false)}
-                            >
-                                Cotización
-                            </a>
-                        </div>
+                        ))}
                     </nav>
                 </div>
             )}
-        </>
+        </div>
     );
 }
+
 
 
 

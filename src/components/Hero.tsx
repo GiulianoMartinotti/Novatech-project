@@ -36,27 +36,25 @@ export default function Hero() {
     return (
         <section
             id="hero"
-            // IMPORTANTE: nada de bg que tape por encima; usamos capas con z-*
-            className="relative min-h-[calc(100svh-var(--nav-offset))] flex items-center snap-child"
+            className="relative overflow-hidden min-h-[100svh] flex items-centerr"
             aria-label="Sección principal"
         >
             {/* Capa de medios (fondo) */}
             <div className="absolute inset-0 z-0">
                 {/* Imagen base (fallback / LCP) */}
                 <Image
-                    src="/media/hero.jpg"      // si aún no la tenés, podés quitar esta <Image>
+                    src="/media/hero.jpg"      
                     alt=""
                     fill
                     priority
                     sizes="100vw"
                     className="object-cover blur-[1.5px] scale-[1.03] brightness-[.9]"
                 />
-                {/* Video (no usar z negativo) */}
-                {/* Para descartar reduce-motion mientras probás, dejalo sin condición */}
+
                 <video
                     className="absolute inset-0 h-full w-full object-cover blur-[1.5px] scale-[1.03] brightness-[.9]"
                     src="/media/hero.mp4"
-                    // poster="/media/hero.jpg"  // actívalo cuando tengas el jpg
+                    // poster="/media/hero.jpg" 
                     muted
                     playsInline
                     loop
