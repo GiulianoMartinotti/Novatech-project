@@ -9,11 +9,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className="bg-white">
-      {/* pt-9 = 36px → altura de la superbarra; ajusta si cambiamos su alto */}
-      <body className="min-h-screen bg-white text-slate-800 antialiased pt-9">
+      {/* h-9 = 36px → espacio para la superbarra fija */}
+      <body className="min-h-screen bg-white text-slate-800 antialiased">
         {children}
       </body>
     </html>
   );
 }
+
+
 

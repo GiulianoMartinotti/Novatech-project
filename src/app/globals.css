@@ -12,12 +12,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
 body {
   background: var(--background);
@@ -29,3 +23,27 @@ body {
 
 /* --- FIX: fondo siempre blanco y sin modo oscuro automático --- */
             /* slate-900 aprox para buen contraste */
+
+/* Forzar esquema claro */
+:root { color-scheme: light; }
+
+/* 👉 Fondo global igual al hero (slate-50) */
+html, body {
+  background: #f8fafc !important; /* era #ffffff */
+  color: #0f172a;
+}
+
+/* Altura por defecto del header/cápsula + separación superior */
+:root { --nav-offset: 96px; }   /* la ajustamos dinámicamente también con JS */
+html { scroll-behavior: smooth; }   /* scroll suave */
+
+/* Soporte scroll-snap en el main que lo use */
+.snap-container {
+  scroll-snap-type: y mandatory;
+}
+.snap-child {
+  scroll-snap-align: start;
+}
+
+/* Evita “saltos” por barras del móvil */
+:root { --vh: 1vh; } /* fallback */
