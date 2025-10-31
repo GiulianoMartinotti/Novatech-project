@@ -2,20 +2,19 @@ import Navbar from "../components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Solutions from "@/components/Solutions";
-import Contact from "@/components/Contact";
 import HowItWorks from "@/components/HowItWorks";
-import Projects from "@/components/Projects";
-import Benefits from "@/components/Benefits";
+import Reasons from "@/components/Reasons";
 import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
+import Advantages from "@/components/Advantages";
 
 export default function HomePage() {
   return (
     <>
       <Navbar />
       <main className="snap-container">
-        
+
         <section id="hero" className="snap-child">
           <Hero />
         </section>
@@ -24,18 +23,39 @@ export default function HomePage() {
           <About />
         </section>
 
-        <section id="soluciones" className="snap-child">
-          <Solutions variant="lift" />
+        <section id="solutions" className="snap-child">
+          <Solutions />
         </section>
 
-        <HowItWorks />
-        <Projects />
-        <Benefits />
-        <FAQ />
-        <CTA />
-        <Contact />
+        <section id="Advantages" className="snap-child">
+          <Advantages />
+        </section>
+
+        <section id="howItWorks" className="snap-child">
+          <HowItWorks />
+        </section>
+
+        <section id="reasons" className="snap-child">
+          <Reasons />
+        </section>
+
+        <section id="faq" className="snap-child">
+          <FAQ />
+        </section>
+
+        <section id="cta" className="snap-child">
+          <CTA />
+        </section>
+
+
       </main>
       <Footer />
     </>
   );
 }
+
+// <section id="potential" className="snap-child">
+//<Potential/>
+//<PotentialCharts />
+//  </section>
+//

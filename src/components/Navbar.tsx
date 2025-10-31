@@ -1,21 +1,26 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { usePathname } from "next/navigation";
 
-const LINKS = [
-    { href: "#hero", id: "hero", label: "Inicio" },
-    { href: "#nosotros", id: "nosotros", label: "Nosotros" },
-    { href: "#soluciones", id: "soluciones", label: "Servicios" },
-    { href: "#proyectos", id: "proyectos", label: "Proyectos" },
-    { href: "#contacto", id: "contacto", label: "Cotizar" },
+type LinkItem =
+    | { id: "hero" | "nosotros" | "soluciones"; label: string; href: `/#${string}`; kind: "hash" }
+    | { id: "contacto"; label: string; href: "/cotizar"; kind: "route" };
+
+const LINKS: LinkItem[] = [
+    { href: "/#hero", id: "hero", label: "Inicio", kind: "hash" },
+    { href: "/#nosotros", id: "nosotros", label: "Nosotros", kind: "hash" },
+    { href: "/#soluciones", id: "soluciones", label: "Servicios", kind: "hash" },
+    { href: "/cotizar", id: "contacto", label: "Cotizar", kind: "route" },
 ];
 
 export default function Navbar() {
+    const pathname = usePathname();
     const [scrolled, setScrolled] = useState(false);
     const [active, setActive] = useState<string>("hero");
 
-    // sombra/estilo al scrollear
+    // Sombra/estilo al scrollear
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 8);
         onScroll();
@@ -23,23 +28,25 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    // scroll-spy: resalta el link de la sección visible
+    // Scroll-spy SOLO en la home (donde existen las secciones)
     useEffect(() => {
-        const sections = LINKS.map((l) => document.getElementById(l.id)).filter(Boolean) as HTMLElement[];
+        if (pathname !== "/") return;
+
+        const ids = ["hero", "nosotros", "soluciones"];
+        const sections = ids
+            .map((id) => document.getElementById(id))
+            .filter(Boolean) as HTMLElement[];
 
         if (!sections.length) return;
 
         const io = new IntersectionObserver(
             (entries) => {
-                // elegimos la entrada con mayor “intersección”
                 const visible = entries
                     .filter((e) => e.isIntersecting)
                     .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
                 if (visible?.target?.id) setActive(visible.target.id);
             },
             {
-                // foco en el tercio central de la pantalla
                 rootMargin: "-40% 0px -45% 0px",
                 threshold: [0, 0.01, 0.2, 0.4, 0.6, 0.8, 1],
             }
@@ -47,7 +54,21 @@ export default function Navbar() {
 
         sections.forEach((el) => io.observe(el));
         return () => io.disconnect();
-    }, []);
+    }, [pathname]);
+
+    // Si estoy en "/", hago scroll suave; si no, dejo que el <a href="/#id"> navegue normal
+    const handleHashClick = useCallback(
+        (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+            if (pathname !== "/") return; // fuera de la home → navegación normal a "/#id"
+            e.preventDefault();
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+                history.replaceState(null, "", `#${id}`);
+            }
+        },
+        [pathname]
+    );
 
     return (
         <header
@@ -62,21 +83,23 @@ export default function Navbar() {
                     scrolled ? "border border-slate-200 shadow-xl" : "border border-transparent shadow-lg",
                 ].join(" ")}
                 style={{
-                    boxShadow: scrolled
-                        ? "0 34px 90px rgba(0,0,0,0.22)"
-                        : "0 10px 28px rgba(0,0,0,0.08)",
+                    boxShadow: scrolled ? "0 34px 90px rgba(0,0,0,0.22)" : "0 10px 28px rgba(0,0,0,0.08)",
                 }}
             >
                 <div className="h-20 flex items-center">
-                    {/* Logo (más grande) */}
-                    <a href="#hero" className="flex items-center">
+                    {/* Logo */}
+                    <a
+                        href="/#hero"
+                        onClick={(e) => handleHashClick(e, "hero")}
+                        className="flex items-center"
+                    >
                         <Image
-                            src="/media/logo.png"
+                            src="/media/logo2.png"
                             alt="Novatech"
-                            width={180}
-                            height={40}
+                            width={700}
+                            height={700}
                             priority
-                            className="h-16 w-auto"
+                            className="h-40 w-auto"
                         />
                     </a>
 
@@ -84,22 +107,24 @@ export default function Navbar() {
                     <nav className="hidden md:flex flex-1 items-center justify-center">
                         <ul className="flex items-center gap-10 text-[17px] md:text-[18px] font-semibold text-slate-800">
                             {LINKS.map((l) => {
-                                const isActive = active === l.id;
+                                // mantenemos aria-current para accesibilidad (no afecta estilos)
+                                const isActive =
+                                    l.kind === "route"
+                                        ? pathname === l.href
+                                        : pathname === "/" && active === l.id;
+
                                 return (
                                     <li key={l.id}>
                                         <a
                                             href={l.href}
-                                            className={[
-                                                "relative group py-2 transition-colors",
-                                                isActive ? "text-emerald-700" : "hover:text-emerald-700",
-                                            ].join(" ")}
+                                            onClick={l.kind === "hash" ? (e) => handleHashClick(e, l.id) : undefined}
+                                            // SOLO hover (sin estado activo visual)
+                                            className="relative group py-2 transition-colors hover:text-emerald-700"
+                                            aria-current={isActive ? "page" : undefined}
                                         >
                                             {l.label}
                                             <span
-                                                className={[
-                                                    "pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[3px] rounded-full bg-emerald-600 origin-center transition-transform duration-300",
-                                                    isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
-                                                ].join(" ")}
+                                                className="pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[3px] rounded-full bg-emerald-600 origin-center transition-transform duration-300 scale-x-0 group-hover:scale-x-100"
                                             />
                                         </a>
                                     </li>
@@ -112,14 +137,20 @@ export default function Navbar() {
                     <div className="hidden md:block w-[180px]" />
 
                     {/* Hamburguesa / menú móvil */}
-                    <MobileMenu />
+                    <MobileMenu pathname={pathname} handleHashClick={handleHashClick} />
                 </div>
             </div>
         </header>
     );
 }
 
-function MobileMenu() {
+function MobileMenu({
+    pathname,
+    handleHashClick,
+}: {
+    pathname: string;
+    handleHashClick: (e: React.MouseEvent<HTMLAnchorElement>, id: string) => void;
+}) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -155,8 +186,11 @@ function MobileMenu() {
                             <a
                                 key={l.id}
                                 href={l.href}
+                                onClick={(e) => {
+                                    if (l.kind === "hash") handleHashClick(e, l.id);
+                                    setOpen(false);
+                                }}
                                 className="py-2 rounded-md hover:bg-slate-50"
-                                onClick={() => setOpen(false)}
                             >
                                 {l.label}
                             </a>
@@ -167,6 +201,8 @@ function MobileMenu() {
         </div>
     );
 }
+
+
 
 
 

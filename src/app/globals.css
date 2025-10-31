@@ -60,3 +60,46 @@ html { scroll-behavior: smooth; }   /* scroll suave */
 
 html, body { overflow-x: hidden; } /* ya lo tienes, por el blur/scale */
 
+/* Ondas suaves que se desplazan horizontalmente */
+@keyframes wave-slide-slow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes wave-slide-fast {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Helpers Tailwind (si usás Tailwind v3+ podés extender en theme, 
+   pero así funciona al toque) */
+.animate-wave-slow {
+  animation: wave-slide-slow 18s linear infinite;
+}
+.animate-wave-fast {
+  animation: wave-slide-fast 12s linear infinite;
+}
+
+/* Mueve un módulo completo de un contenedor 300% de ancho */
+/* === animación continua: mueve 1 módulo de un contenedor 300% === */
+@keyframes wave-move-33 {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+.animate-wave-33 {
+  animation-name: wave-move-33;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: 9000ms; /* el componente puede sobreescribirlo inline */
+}
+
+
+@keyframes wave-bob {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(var(--bob, 10px)); }
+  100% { transform: translateY(0); }
+}
+.animate-wave-bob {
+  --bob: 10px;             /* sobrescribible */
+  animation: wave-bob ease-in-out infinite;
+  animation-duration: 4200ms; /* sobrescrito inline */
+}

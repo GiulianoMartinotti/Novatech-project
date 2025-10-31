@@ -1,165 +1,160 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
-import { CheckCircleIcon, GlobeAmericasIcon, BoltIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle2, Leaf, Target, Crosshair, ChevronDown } from "lucide-react";
+import Waves from "./Waves";
 
-const fadeUp: Variants = {
-    hidden: { y: 24, opacity: 0 },
-    show: { y: 0, opacity: 1, transition: { duration: .6, ease: "easeOut" } },
-};
-const stagger = {
-    hidden: { opacity: 1 },
-    show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } }
-};
+type TabKey = "adn" | "objetivo" | "enfoque";
 
-export default function About() {
+const TABS: { key: TabKey; label: string; icon: React.ElementType; text: string }[] = [
+    { key: "adn", label: "Nosotros", icon: Leaf, text: "Somos una empresa Argentina y Chilena con amplia experiencia en el rubro energético. Desde 2015 priorizamos seguridad eléctrica, materiales de primera línea y una experiencia sin fricción para el cliente." },
+    { key: "objetivo", label: "Objetivo", icon: Target, text: "Brindar y diseñar las mejores soluciones solares a medida para aprovechar eficientemente la radiación y cubrir la energía necesaria en industria, agro, comercio y hogares, con retorno claro de inversión." },
+    { key: "enfoque", label: "Enfoque", icon: Crosshair, text: "Acompañamiento de punta a punta: análisis de consumo, ingeniería, instalación certificada y monitoreo, cumpliendo normativas de Generación Distribuida vigentes." },
+];
+
+function Pill({ active, onClick, children, Icon, label }: {
+    active: boolean; onClick: () => void; children: React.ReactNode; Icon: React.ElementType; label: string;
+}) {
     return (
-        <section
-            id="nosotros"
-            className="relative min-h-[100svh] snap-child bg-slate-50/60 py-16 md:py-28"
-            aria-label="Quiénes somos"
+        <button
+            type="button"
+            onClick={onClick}
+            aria-pressed={active}
+            className={[
+                "group inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition",
+                "ring-1 shadow-sm",
+                active ? "bg-white text-emerald-700 ring-emerald-700/15 shadow-emerald-900/10"
+                    : "bg-emerald-50 text-emerald-800/70 ring-emerald-900/10 hover:bg-emerald-100 hover:text-emerald-800",
+            ].join(" ")}
         >
-            {/* fondo sutil */}
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-slate-100/60 to-white" />
+            <Icon className={["h-4 w-4", active ? "text-emerald-600" : "text-emerald-500"].join(" ")} aria-hidden />
+            <span>{label}</span>
+            {children}
+        </button>
+    );
+}
 
-            <div className="mx-auto max-w-6xl px-4 md:px-6 grid md:grid-cols-5 gap-10 items-center">
-                {/* Texto principal */}
-                <div className="md:col-span-3">
-                    <motion.span
-                        variants={fadeUp}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="inline-flex items-center gap-2 rounded-full bg-emerald-600/10 text-emerald-700 px-3 py-1 text-[13px] font-semibold"
+function AccordionItem({ title, children, defaultOpen = false }: {
+    title: string; children: React.ReactNode; defaultOpen?: boolean;
+}) {
+    const [open, setOpen] = useState(defaultOpen);
+    return (
+        <div className="rounded-2xl bg-white/80 ring-1 ring-emerald-900/10 shadow-sm">
+            <button type="button" onClick={() => setOpen(v => !v)} aria-expanded={open} className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left">
+                <span className="inline-flex items-center gap-2 text-emerald-950/90">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden />
+                    <span className="font-medium">{title}</span>
+                </span>
+                <ChevronDown className={["h-5 w-5 shrink-0 transition-transform", open ? "rotate-180 text-emerald-700" : "text-emerald-500"].join(" ")} aria-hidden />
+            </button>
+            <AnimatePresence initial={false}>
+                {open && (
+                    <motion.div
+                        key="content"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="px-4"
                     >
-                        <BoltIcon className="h-4 w-4" />
-                        Desde 2015
-                    </motion.span>
+                        <div className="pb-4 pt-1 text-sm text-emerald-950/75">{children}</div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
 
-                    <motion.h2
-                        variants={fadeUp}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900"
-                    >
-                        Quiénes somos
+export default function Nosotros() {
+    const [tab, setTab] = useState<TabKey>("adn");
+    const active = TABS.find(t => t.key === tab)!;
+
+    return (
+        <section id="nosotros" className="relative">
+
+                                    <div className="pointer-events-none absolute left-0 right-0 -top-[88px] h-[128px] z-[30] overflow-visible">
+                                        <Waves
+                                            color="white"
+                                            height={96}
+                                            featherPx={0}
+                                            durationMs={14000}
+                                            bobMs={6200}
+                                            bobPx={6}
+                                            className="absolute inset-0 z-[2] translate-y-[8px]"
+                                        />
+                                        <Waves
+                                            color="white"
+                                            height={104}
+                                            featherPx={0}
+                                            durationMs={16000}
+                                            bobMs={7000}
+                                            bobPx={7}
+                                            className="absolute inset-0 z-[3]"
+                                        />
+                                    </div>
+
+
+
+
+            <div className="relative bg-gradient-to-b from-white to-[#F7FCFA]">
+                <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-20 md:py-28 text-center">
+                    <motion.div initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.35 }}
+                        className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-800 ring-1 ring-emerald-700/10 shadow-sm mb-6">
+                        <span className="text-xs md:text-sm font-bold uppercase tracking-wide">NOVATECH ENERGY</span>
+                    </motion.div>
+
+                    <motion.h2 initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
+                        className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-emerald-900">
+                        CONECTA CON LA NATURALEZA JUNTO A NOSOTROS
                     </motion.h2>
 
-                    <motion.p
-                        variants={fadeUp}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="mt-5 text-lg leading-relaxed text-slate-700"
-                    >
-                        Somos una empresa <strong>argentina y chilena</strong> con vasta trayectoria en el rubro
-                        energético, medio ambiente y seguridad laboral. Desde 2015 nos dedicamos a la{" "}
-                        <strong>ingeniería e instalación de energías renovables</strong> en Argentina y Chile.
-                        Complementariamente, dentro de nuestros objetivos está la{" "}
-                        <strong>difusión, educación y el asesoramiento en ahorro energético</strong>.
+                    <motion.p initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: 0.05 }}
+                        className="mt-4 text-lg md:text-xl text-emerald-950/70">
+                        Comprometidos con el cuidado del medio ambiente.
                     </motion.p>
 
-                    <motion.p
-                        variants={fadeUp}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="mt-4 text-lg leading-relaxed text-slate-700"
-                    >
-                        Generamos conciencia ambiental, racionalizamos el consumo y ayudamos a{" "}
-                        <strong>reducir gastos eléctricos</strong>. Acompañamos la modernización y adaptación de
-                        negocios a los tiempos actuales, promoviendo el <strong>autabastecimiento</strong> y
-                        aprovechando los beneficios de la normativa de{" "}
-                        <strong>Generación Distribuida</strong> vigente.
-                    </motion.p>
-
-                    {/* lista de puntos */}
-                    <motion.ul
-                        variants={stagger}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="mt-6 space-y-3 text-slate-800"
-                    >
-                        {[
-                            "Ingeniería e instalación de sistemas solares on-grid, off-grid e híbridos.",
-                            "Asesoramiento integral en ahorro y eficiencia energética.",
-                            "Capacitación, difusión y acompañamiento técnico.",
-                        ].map((t) => (
-                            <motion.li key={t} variants={fadeUp} className="flex items-start gap-3">
-                                <CheckCircleIcon className="mt-1 h-5 w-5 text-emerald-600" />
-                                <span>{t}</span>
-                            </motion.li>
+                    <div className="mt-8 flex items-center justify-center gap-4">
+                        {TABS.map(t => (
+                            <Pill key={t.key} active={tab === t.key} onClick={() => setTab(t.key)} Icon={t.icon} label={t.label}>
+                                {tab === t.key && <span className="absolute inset-0 -z-10 rounded-full blur-md opacity-20 bg-emerald-500/50" />}
+                            </Pill>
                         ))}
-                    </motion.ul>
+                    </div>
 
-                    {/* chips / identidad */}
-                    <motion.div
-                        variants={fadeUp}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="mt-8 flex flex-wrap gap-3"
-                    >
-                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700">
-                            <GlobeAmericasIcon className="h-4 w-4 text-emerald-600" />
-                            Argentina + Chile
-                        </span>
-                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700">
-                            Ingeniería &amp; instalación
-                        </span>
-                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700">
-                            Generación Distribuida
-                        </span>
-                    </motion.div>
+                    <div className="relative mx-auto mt-8 max-w-3xl">
+                        <AnimatePresence mode="wait">
+                            <motion.p key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}
+                                className="text-base md:text-lg text-emerald-950/75">
+                                {active.text}
+                            </motion.p>
+                        </AnimatePresence>
+                    </div>
 
-                    {/* CTAs */}
-                    <motion.div
-                        variants={fadeUp}
-                        initial="hidden"
-                        whileInView="show"
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="mt-8 flex flex-wrap gap-3"
-                    >
-                        <a
-                            href="#proyectos"
-                            className="rounded-xl bg-emerald-600 px-5 py-3 text-white font-medium hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
-                        >
-                            Ver proyectos
-                        </a>
-                        <a
-                            href="#contacto"
-                            className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-slate-800 font-medium hover:bg-slate-50"
-                        >
-                            Contactanos
-                        </a>
+                    <div className="mt-10 grid gap-3 text-left">
+                        <AccordionItem title="Ingeniería e instalación on-grid, off-grid e híbridos.">
+                            Diseñamos y dimensionamos tu sistema según consumo real y proyección. Instalación certificada con documentación completa y puesta en marcha prolija.
+                        </AccordionItem>
+                        <AccordionItem title="Asesoramiento integral en ahorro y eficiencia energética.">
+                            Analizamos hábitos de consumo, medimos oportunidades y proponemos mejoras para reducir la factura desde el primer mes, sin perder confort ni productividad.
+                        </AccordionItem>
+                        <AccordionItem title="Capacitación, difusión y acompañamiento técnico.">
+                            Te enseñamos a interpretar el rendimiento, conectamos monitoreo y brindamos soporte post–venta para mantener la instalación al 100%.
+                        </AccordionItem>
+                    </div>
+
+                    <motion.div initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: 0.1 }}
+                        className="mt-8 flex flex-wrap items-center justify-center gap-2">
+                        {["Argentina + Chile", "Ingeniería & instalación", "Generación Distribuida"].map(chip => (
+                            <span key={chip} className="rounded-full bg-white px-3 py-1 text-sm text-emerald-900 ring-1 ring-emerald-900/10 shadow-sm">{chip}</span>
+                        ))}
                     </motion.div>
                 </div>
-
-                
-                <motion.div
-                    variants={fadeUp}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, amount: 0.3 }}
-                    className="md:col-span-2"
-                >
-                    <div className="rounded-3xl border border-slate-200 bg-white/70 backdrop-blur p-5 shadow-lg">
-                        <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
-                            
-                            <img
-                                src="/media/about.jpg"
-                                alt="Equipo de trabajo Novatech"
-                                className="h-full w-full object-cover"
-                            />
-                        </div>
-                        <div className="mt-4 text-sm text-slate-600 leading-relaxed">
-                            Estamos cerca de nuestros clientes, con soluciones a medida y soporte de principio a fin.
-                        </div>
-                    </div>
-                </motion.div>
             </div>
         </section>
     );
 }
+
+
+
+

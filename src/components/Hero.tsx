@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 /** Variants (igual que los tuyos) */
@@ -23,7 +22,6 @@ const cardItem: Variants = {
 };
 
 export default function Hero() {
-    // Respeta reduce motion, pero no bloqueemos el render para probar
     const [reduced, setReduced] = useState(false);
     useEffect(() => {
         const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -41,15 +39,14 @@ export default function Hero() {
         >
             {/* Capa de medios (fondo) */}
             <div className="absolute inset-0 z-0">
-                {/* Imagen base (fallback / LCP) */}
-                <Image
+                {/* Imagen base (fallback / LCP)                 <Image
                     src="/media/hero.jpg"      
                     alt=""
                     fill
                     priority
                     sizes="100vw"
                     className="object-cover blur-[1.5px] scale-[1.03] brightness-[.9]"
-                />
+                /> */}
 
                 <video
                     className="absolute inset-0 h-full w-full object-cover blur-[1.5px] scale-[1.03] brightness-[.9]"
@@ -87,7 +84,7 @@ export default function Hero() {
                         viewport={{ once: true, amount: 0.3 }}
                         className="mt-4 text-lg text-white/90 drop-shadow"
                     >
-                        Ahorro, independencia y respaldo para tu hogar o empresa con sistemas on-grid, off-grid e híbridos.
+                        Ahorro, independencia y respaldo para tu hogar o empresa.
                     </motion.p>
 
                     <motion.div

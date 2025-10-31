@@ -5,6 +5,45 @@ const faqs = [
     { q: "¿Qué mantenimiento requiere?", a: "Mínimo: limpieza de paneles y chequeos anuales. Monitoreo remoto incluido." },
     { q: "¿Necesito baterías?", a: "No en on-grid. Recomendadas para respaldo o en ubicaciones sin red (off-grid)." },
     { q: "¿Se puede ampliar?", a: "Sí, diseñamos escalable por etapas (paneles, inversor, bancos de baterías)." },
+    {
+        q: "¿Qué condiciones debe cumplir mi techo/espacio?",
+        a: (
+            <ul className="list-disc pl-5 space-y-1">
+                <li>Orientación N/NE/NO e inclinación 10–35° (ideal: sin sombras).</li>
+                <li>De referencia, 3–5 kWp requieren 15–25 m².</li>
+                <li>Instalamos en chapa, losa o estructuras a medida.</li>
+            </ul>
+        ),
+    },
+    {
+        q: "¿Qué pasa cuando se corta la luz?",
+        a: (
+            <div className="space-y-1">
+                <div><b>On-Grid:</b> por seguridad se apaga (anti-isla).</div>
+                <div><b>Híbrido:</b> mantiene cargas críticas con baterías y/o red cuando vuelve.</div>
+                <div><b>Off-Grid:</b> opera siempre con banco de baterías, sin depender de la red.</div>
+            </div>
+        ),
+    },
+    {
+        q: "¿Cómo rinden en días nublados y en invierno?",
+        a: (
+            <ul className="list-disc pl-5 space-y-1">
+                <li>
+                    <b>Días nublados:</b> la producción baja (aprox. <b>10–40%</b> respecto a un día despejado),
+                    pero sigue habiendo generación por la luz difusa.
+                </li>
+                <li>
+                    <b>Lluvia:</b> además de generar menos, ayuda a <b>limpiar</b> los paneles.
+                </li>
+                <li>
+                    <b>Invierno:</b> hay menos horas de sol; se compensa con <b>buena orientación/inclinación </b> 
+                        y dimensionamiento adecuado.
+                </li>
+            </ul>
+        ),
+    },
+
 ];
 
 export default function FAQ() {
