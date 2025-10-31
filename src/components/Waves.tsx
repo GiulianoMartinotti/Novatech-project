@@ -11,7 +11,7 @@ type WavesProps = {
     opacity?: number;
     color?: string;       // HEX o rgba, sobreescribe currentColor
     className?: string;
-    featherPx?: number;   
+    featherPx?: number;
 };
 
 export default function Waves({
@@ -51,8 +51,19 @@ export default function Waves({
             transparent)`,
                 }}
             >
-                <WaveStrip durationMs={durationMs} bobMs={bobMs} bobPx={bobPx} opacity={opacity * 0.7} />
-                <WaveStrip durationMs={Math.round(durationMs * 0.82)} bobMs={Math.round(bobMs * 1.15)} bobPx={bobPx * 0.6} opacity={opacity} delayMs={-600} />
+                <WaveStrip
+                    durationMs={durationMs}
+                    bobMs={bobMs}
+                    bobPx={bobPx}
+                    opacity={opacity * 0.7}
+                />
+                <WaveStrip
+                    durationMs={Math.round(durationMs * 0.82)}
+                    bobMs={Math.round(bobMs * 1.15)}
+                    bobPx={bobPx * 0.6}
+                    opacity={opacity}
+                    delayMs={-600}
+                />
             </div>
         </div>
     );
@@ -71,18 +82,17 @@ function WaveStrip({
     opacity: number;
     delayMs?: number;
 }) {
+    // Tipamos el style para incluir la custom property CSS --bob sin usar `any`.
+    type BobStyle = React.CSSProperties & { ["--bob"]?: string };
+    const styleBob: BobStyle = {
+        animationDuration: `${bobMs}ms`,
+        animationDelay: `${delayMs}ms`,
+        ["--bob"]: `${bobPx}px`,
+    };
+
     return (
         // Wrapper: bobbing vertical
-        <div
-            className="absolute left-0 top-0 h-full w-full animate-wave-bob will-change-transform"
-            style={{
-                animationDuration: `${bobMs}ms`,
-                animationDelay: `${delayMs}ms`,
-                // permitir sobreescribir amplitud por instancia (opcional)
-                // @ts-ignore
-                ["--bob" as any]: `${bobPx}px`,
-            }}
-        >
+        <div className="absolute left-0 top-0 h-full w-full animate-wave-bob will-change-transform" style={styleBob}>
             {/* Hijo: scroll horizontal infinito */}
             <div
                 className="h-full w-[300%] flex animate-wave-33 will-change-transform"
@@ -104,5 +114,6 @@ function WaveStrip({
         </div>
     );
 }
+
 
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 
@@ -56,10 +57,10 @@ export default function Navbar() {
         return () => io.disconnect();
     }, [pathname]);
 
-    // Si estoy en "/", hago scroll suave; si no, dejo que el <a href="/#id"> navegue normal
+    // Scroll suave en la home
     const handleHashClick = useCallback(
-        (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-            if (pathname !== "/") return; // fuera de la home → navegación normal a "/#id"
+        (e: React.MouseEvent, id: string) => {
+            if (pathname !== "/") return; // fuera de la home → navegación normal
             e.preventDefault();
             const el = document.getElementById(id);
             if (el) {
@@ -88,52 +89,84 @@ export default function Navbar() {
             >
                 <div className="h-20 flex items-center">
                     {/* Logo */}
-                    <a
-                        href="/#hero"
-                        onClick={(e) => handleHashClick(e, "hero")}
-                        className="flex items-center"
-                    >
-                        <Image
-                            src="/media/logo2.png"
-                            alt="Novatech"
-                            width={700}
-                            height={700}
-                            priority
-                            className="h-40 w-auto"
-                        />
-                    </a>
+                    {pathname === "/" ? (
+                        <button
+                            type="button"
+                            onClick={(e) => handleHashClick(e, "hero")}
+                            className="flex items-center"
+                            aria-label="Ir al inicio"
+                        >
+                            <Image
+                                src="/media/logo2.png"
+                                alt="Novatech"
+                                width={700}
+                                height={700}
+                                priority
+                                className="h-40 w-auto"
+                            />
+                        </button>
+                    ) : (
+                        <Link href="/#hero" className="flex items-center" aria-label="Ir al inicio">
+                            <Image
+                                src="/media/logo2.png"
+                                alt="Novatech"
+                                width={700}
+                                height={700}
+                                priority
+                                className="h-40 w-auto"
+                            />
+                        </Link>
+                    )}
 
                     {/* Menú centrado */}
                     <nav className="hidden md:flex flex-1 items-center justify-center">
                         <ul className="flex items-center gap-10 text-[17px] md:text-[18px] font-semibold text-slate-800">
                             {LINKS.map((l) => {
-                                // mantenemos aria-current para accesibilidad (no afecta estilos)
+                                // aria-current para accesibilidad (no afecta estilos)
                                 const isActive =
-                                    l.kind === "route"
-                                        ? pathname === l.href
-                                        : pathname === "/" && active === l.id;
+                                    l.kind === "route" ? pathname === l.href : pathname === "/" && active === l.id;
 
                                 return (
                                     <li key={l.id}>
-                                        <a
-                                            href={l.href}
-                                            onClick={l.kind === "hash" ? (e) => handleHashClick(e, l.id) : undefined}
-                                            // SOLO hover (sin estado activo visual)
-                                            className="relative group py-2 transition-colors hover:text-emerald-700"
-                                            aria-current={isActive ? "page" : undefined}
-                                        >
-                                            {l.label}
-                                            <span
-                                                className="pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[3px] rounded-full bg-emerald-600 origin-center transition-transform duration-300 scale-x-0 group-hover:scale-x-100"
-                                            />
-                                        </a>
+                                        {l.kind === "route" ? (
+                                            // Rutas internas → Link obligatorio
+                                            <Link
+                                                href={l.href}
+                                                className="relative group py-2 transition-colors hover:text-emerald-700"
+                                                aria-current={isActive ? "page" : undefined}
+                                            >
+                                                {l.label}
+                                                <span className="pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[3px] rounded-full bg-emerald-600 origin-center transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
+                                            </Link>
+                                        ) : pathname === "/" ? (
+                                            // En home: scroll suave (button evita la regla de Link)
+                                            <button
+                                                type="button"
+                                                onClick={(e) => handleHashClick(e, l.id)}
+                                                className="relative group py-2 transition-colors hover:text-emerald-700"
+                                                aria-current={isActive ? "page" : undefined}
+                                            >
+                                                {l.label}
+                                                <span className="pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[3px] rounded-full bg-emerald-600 origin-center transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
+                                            </button>
+                                        ) : (
+                                            // Fuera de home: navegar con Link a /#id
+                                            <Link
+                                                href={l.href}
+                                                className="relative group py-2 transition-colors hover:text-emerald-700"
+                                                aria-current={isActive ? "page" : undefined}
+                                            >
+                                                {l.label}
+                                                <span className="pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[3px] rounded-full bg-emerald-600 origin-center transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
+                                            </Link>
+                                        )}
                                     </li>
                                 );
                             })}
                         </ul>
                     </nav>
 
-                    
+                    {/* Reserva para centrar */}
                     <div className="hidden md:block w-[180px]" />
 
                     {/* Hamburguesa / menú móvil */}
@@ -149,7 +182,7 @@ function MobileMenu({
     handleHashClick,
 }: {
     pathname: string;
-    handleHashClick: (e: React.MouseEvent<HTMLAnchorElement>, id: string) => void;
+    handleHashClick: (e: React.MouseEvent, id: string) => void;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -162,19 +195,9 @@ function MobileMenu({
             >
                 <svg width="22" height="22" viewBox="0 0 24 24">
                     {open ? (
-                        <path
-                            d="M6 6l12 12M6 18L18 6"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                        />
+                        <path d="M6 6l12 12M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     ) : (
-                        <path
-                            d="M4 7h16M4 12h16M4 17h16"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                        />
+                        <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     )}
                 </svg>
             </button>
@@ -182,19 +205,39 @@ function MobileMenu({
             {open && (
                 <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-slate-200 bg-white shadow-lg">
                     <nav className="px-4 py-3 flex flex-col gap-1 text-slate-800">
-                        {LINKS.map((l) => (
-                            <a
-                                key={l.id}
-                                href={l.href}
-                                onClick={(e) => {
-                                    if (l.kind === "hash") handleHashClick(e, l.id);
-                                    setOpen(false);
-                                }}
-                                className="py-2 rounded-md hover:bg-slate-50"
-                            >
-                                {l.label}
-                            </a>
-                        ))}
+                        {LINKS.map((l) =>
+                            l.kind === "route" ? (
+                                <Link
+                                    key={l.id}
+                                    href={l.href}
+                                    className="py-2 rounded-md hover:bg-slate-50"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    {l.label}
+                                </Link>
+                            ) : pathname === "/" ? (
+                                <button
+                                    key={l.id}
+                                    type="button"
+                                    onClick={(e) => {
+                                        handleHashClick(e, l.id);
+                                        setOpen(false);
+                                    }}
+                                    className="text-left py-2 rounded-md hover:bg-slate-50"
+                                >
+                                    {l.label}
+                                </button>
+                            ) : (
+                                <Link
+                                    key={l.id}
+                                    href={l.href}
+                                    className="py-2 rounded-md hover:bg-slate-50"
+                                    onClick={() => setOpen(false)}
+                                >
+                                    {l.label}
+                                </Link>
+                            )
+                        )}
                     </nav>
                 </div>
             )}

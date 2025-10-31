@@ -2,11 +2,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ChangeEventHandler } from "react";
 import { ArrowRight, Phone, MapPin, Building2, Paperclip } from "lucide-react";
 
 type Props = {
     defaultTipo?: string; // "hibrido" | "ongrid" | "offgrid"
 };
+
+type Conexion = "" | "Monofásica" | "Trifásica";
+type Techo = "" | "Inclinado" | "Recto (plano)";
 
 const TIPOS = [
     { value: "hibrido", label: "Sistema Híbrido" },
@@ -24,13 +28,13 @@ export default function QuoteForm({ defaultTipo = "" }: Props) {
     const [consumo, setConsumo] = useState(""); // kWh/mes aprox
     const [comentarios, setComentarios] = useState("");
 
-    // NUEVOS CAMPOS
-    const [conexion, setConexion] = useState<"" | "Monofásica" | "Trifásica">("");
-    const [techo, setTecho] = useState<"" | "Inclinado" | "Recto (plano)">("");
+    // NUEVOS CAMPOS (tipados sin any)
+    const [conexion, setConexion] = useState<Conexion>("");
+    const [techo, setTecho] = useState<Techo>("");
     const [factura, setFactura] = useState<File | null>(null);
 
     const isValid = useMemo(() => {
-        return tipo && nombre && (telefono || email) && provincia;
+        return Boolean(tipo && nombre && (telefono || email) && provincia);
     }, [tipo, nombre, telefono, email, provincia]);
 
     const wppNumber = process.env.NEXT_PUBLIC_WPP_NUMBER || "";
@@ -78,6 +82,12 @@ export default function QuoteForm({ defaultTipo = "" }: Props) {
             alert("No se pudo copiar. Probá el botón de WhatsApp.");
         }
     }
+
+    // Handlers estrictos para selects (eliminan `any`)
+    const handleConexion: ChangeEventHandler<HTMLSelectElement> = (e) =>
+        setConexion(e.target.value as Conexion);
+    const handleTecho: ChangeEventHandler<HTMLSelectElement> = (e) =>
+        setTecho(e.target.value as Techo);
 
     return (
         <form
@@ -193,7 +203,7 @@ export default function QuoteForm({ defaultTipo = "" }: Props) {
                     </label>
                     <select
                         value={conexion}
-                        onChange={(e) => setConexion(e.target.value as any)}
+                        onChange={handleConexion}
                         className="w-full rounded-xl bg-[#0d1733] text-white border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-400/60"
                     >
                         <option value="">Elegí una opción</option>
@@ -209,7 +219,7 @@ export default function QuoteForm({ defaultTipo = "" }: Props) {
                     </label>
                     <select
                         value={techo}
-                        onChange={(e) => setTecho(e.target.value as any)}
+                        onChange={handleTecho}
                         className="w-full rounded-xl bg-[#0d1733] text-white border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-400/60"
                     >
                         <option value="">Elegí una opción</option>
@@ -260,8 +270,8 @@ export default function QuoteForm({ defaultTipo = "" }: Props) {
                     </div>
                     {factura && (
                         <p className="mt-2 text-xs text-gray-300">
-                            Archivo seleccionado: <span className="font-medium">{factura.name}</span>. WhatsApp no permite adjuntarlo
-                            automáticamente; adjuntalo cuando se abra el chat 🙌
+                            Archivo seleccionado: <span className="font-medium">{factura.name}</span>. WhatsApp no
+                            permite adjuntarlo automáticamente; adjuntalo cuando se abra el chat 🙌
                         </p>
                     )}
                 </div>
@@ -295,8 +305,10 @@ export default function QuoteForm({ defaultTipo = "" }: Props) {
 
             {/* Ayuda */}
             <p className="mt-4 text-xs text-gray-400">
-                Campos obligatorios: Tipo de solución, Nombre, Provincia, y un medio de contacto (WhatsApp o Email).
+                Campos obligatorios: Tipo de solución, Nombre, Provincia, y un medio de contacto (WhatsApp o
+                Email).
             </p>
         </form>
     );
 }
+
