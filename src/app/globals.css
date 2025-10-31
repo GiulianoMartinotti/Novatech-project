@@ -56,7 +56,7 @@ html { scroll-behavior: smooth; }   /* scroll suave */
 @media (min-width: 768px) {
   :root { --nav-gap: 1.5rem; } /* md: same as top-6 (24px) */
 }
-/* Si cambias la separación en otros breakpoints, agrega más media queries */
+
 
 html, body { overflow-x: hidden; } /* ya lo tienes, por el blur/scale */
 

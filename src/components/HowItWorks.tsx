@@ -35,7 +35,7 @@ export default function HowWorks() {
                 </motion.div>
 
                 <div className="relative mt-12 md:mt-16">
-                    {/* Aumentamos el gap para dar aire a las flechas */}
+                    
                     <div className="grid gap-8 lg:gap-10 xl:gap-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                         {STEPS.map((s, i) => (
                             <StepCard

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Waves from "./Waves";
-import SectionDivider from "./SectionDiver";
 import {
     PlugZap,   // Híbrido
     Bolt,      // On-Grid
@@ -11,8 +10,6 @@ import {
     ArrowRight
 } from "lucide-react";
 
-const BG_DARK = "#0A1124";     
-const BG_LIGHT = "#F4FBF7";    
 
 type Item = {
     key: string;

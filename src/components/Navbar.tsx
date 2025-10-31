@@ -133,7 +133,7 @@ export default function Navbar() {
                         </ul>
                     </nav>
 
-                    {/* Reservo espacio simétrico a la derecha para que el centro quede perfecto */}
+                    
                     <div className="hidden md:block w-[180px]" />
 
                     {/* Hamburguesa / menú móvil */}

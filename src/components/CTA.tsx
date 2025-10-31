@@ -1,7 +1,6 @@
 "use client";
 
 export default function CTA() {
-    // Si quieres cambiar el número, ajusta la env var en .env.local o el fallback:
     const wpp = process.env.NEXT_PUBLIC_WPP_NUMBER ?? "543515600638";
     const wppUrl = `https://wa.me/${wpp}`;
 

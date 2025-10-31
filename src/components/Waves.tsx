@@ -11,7 +11,7 @@ type WavesProps = {
     opacity?: number;
     color?: string;       // HEX o rgba, sobreescribe currentColor
     className?: string;
-    featherPx?: number;   // ← NUEVO: desvanecido arriba/abajo en px
+    featherPx?: number;   
 };
 
 export default function Waves({
